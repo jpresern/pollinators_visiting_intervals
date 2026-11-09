@@ -1,0 +1,10 @@
+subject,records,bouts,median_records_per_bout,max_records_per_bout
+honeybee,1432,222,3.0,65
+hoverfly,48,40,1.0,3
+fly,32,27,1.0,3
+solitary bee,30,27,1.0,2
+bumblebee type 1,27,24,1.0,3
+bumblebee type 3,12,12,1.0,1
+bumblebee type 2,11,10,1.0,2
+bumblebee type 4,4,4,1.0,1
+bee-fly,1,1,1.0,1

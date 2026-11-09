@@ -1,0 +1,8 @@
+# Versions used to verify the results (Python 3.14.2).
+# The manuscript results were also produced with pandas 2.3.3, numpy 2.4.2, scipy 1.17.0, statsmodels 0.14.6.
+pandas==3.1.1
+numpy==2.5.4
+scipy==1.18.1
+statsmodels==0.15.0
+matplotlib==3.10.8
+openpyxl==3.1.5

@@ -1,0 +1,103 @@
+Python 3.14.2 | pandas 3.1.1 | numpy 2.5.4 | statsmodels 0.15.0 | scipy 1.18.1 
+
+=== DATASET: apple_flower_visits.xlsx, sheet 'apple' ===
+records 1597 | observations 42 | dates ['2017-04-06', '2017-04-07', '2017-04-10', '2017-04-11', '2018-04-21', '2018-04-23', '2018-04-24']
+                  records  bouts  median_records_per_bout  max_records_per_bout
+subject                                                                        
+honeybee             1432    222                      3.0                    65
+hoverfly               48     40                      1.0                     3
+fly                    32     27                      1.0                     3
+solitary bee           30     27                      1.0                     2
+bumblebee type 1       27     24                      1.0                     3
+bumblebee type 3       12     12                      1.0                     1
+bumblebee type 2       11     10                      1.0                     2
+bumblebee type 4        4      4                      1.0                     1
+bee-fly                 1      1                      1.0                     1
+honeybee share 89.7% | duration median 5.38 s IQR 3.17-8.78 | previous interval median 276 s IQR 104-687 | sun/shade {'sun': 722, 'shade': 710}
+Temp: min 9.9, median 21.1, max 27.9
+solar: min 0.0, median 533.8, max 793.3
+wind: min 0.6, median 3.3, max 11.8
+
+=== PREVIOUS DURATION (Models D1-D3) ===
+
+=== honeybee: 1210 pairs from 169 visits in 33 observations ===
+1) Spearman rho = 0.090, p = 0.00168  (ignores clustering)
+2) LMM random intercept: observation            slope = 0.026 [-0.032, 0.084], p = 0.38   -> 2x longer previous = +1.8% current
+   variances: observation 0.621, residual 0.659
+2) LMM + Temp, solar, wind, sun/shade           slope = 0.010 [-0.049, 0.068], p = 0.748   -> 2x longer previous = +0.7% current
+   variances: observation 0.646, residual 0.651
+2) LMM random intercepts: observation / visit   slope = -0.015 [-0.078, 0.047], p = 0.636   -> 2x longer previous = -1.0% current
+   variances: observation 0.668, visit 0.046, residual 0.627
+3) Within-visit order test: rho = 0.090 vs shuffled 0.089 (95% 0.042..0.136), p = 0.949
+-> results/honeybee_duration_analysis.png
+
+=== PREVIOUS INTERVAL (Models I1-I4) ===
+
+=== honeybee: 1200 records from 168 visits, 33 observations ===
+Spearman rho (no adjustment) = 0.173, p = 1.6e-09
+Correlation of log(previous interval) with covariates (Spearman):
+  Temp -0.05, solar -0.12, wind +0.01, hour +0.05, rank -0.15, log_prev_dur +0.05
+
+Effect of log(previous interval) on log(duration)  [slope, 95% CI]
+  unadjusted                                     0.070 [ 0.041,  0.100]  p = 2.62e-06   2x longer interval -> +5.0% duration
+  adjusted for all covariates                    0.068 [ 0.039,  0.098]  p = 6.11e-06   2x longer interval -> +4.9% duration
+  adjusted, within visit (same bee)              0.058 [ 0.026,  0.090]  p = 0.000322   2x longer interval -> +4.1% duration
+  adjusted, between visits                       0.141 [ 0.058,  0.223]  p = 0.000813   2x longer interval -> +10.2% duration
+
+Interval quartiles (adjusted, relative to Q1):
+  Q1 shortest      0.2 –   102.6 s  reference
+  Q2             102.6 –   271.3 s   +10.5% [-3.0, +26.0]  p = 0.133
+  Q3             271.3 –   682.8 s   +12.1% [-1.7, +27.8]  p = 0.0892
+  Q4 longest     682.8 –  9398.2 s   +33.2% [+16.0, +53.0]  p = 5.05e-05
+
+Random-effect variances:
+  I1: observation 0.573, flower 0.031, visit 0.003, residual 0.624
+  I2: observation 0.526, flower 0.032, visit 0.023, residual 0.614
+  I3: observation 0.478, flower 0.028, visit 0.021, residual 0.615
+  I4: observation 0.633, flower 0.023, visit 0.000, residual 0.627
+
+Full adjusted model (m2) – fixed effects:
+                     Coef. Std.Err.       z  P>|z|  [0.025  0.975]
+Intercept            0.629    0.273   2.305  0.021   0.094   1.164
+C(sunshade)[T.sun]   0.118    0.071   1.675  0.094  -0.020   0.257
+log_int_within       0.058    0.016   3.597  0.000   0.026   0.090
+log_int_between      0.141    0.042   3.348  0.001   0.058   0.223
+Temp_z              -0.237    0.090  -2.619  0.009  -0.414  -0.060
+solar_z              0.098    0.072   1.364  0.173  -0.043   0.238
+wind_z              -0.025    0.042  -0.590  0.555  -0.108   0.058
+hour_z               0.109    0.084   1.290  0.197  -0.056   0.274
+rank_z              -0.018    0.039  -0.459  0.646  -0.095   0.059
+log_prev_dur        -0.029    0.033  -0.885  0.376  -0.094   0.035
+Group Var            0.478    0.184                               
+flower Var           0.028    0.038                               
+visit Var            0.021    0.051                               
+-> results/honeybee_interval_analysis.png
+
+=== MANUSCRIPT SUMMARY (% change, 95% CI, p) ===
+D1 previous duration x2: +1.8% [-2.2, +6.0], p = 0.38
+D2 previous duration x2: +0.7% [-3.3, +4.8], p = 0.748
+D3 previous duration x2: -1.0% [-5.2, +3.3], p = 0.636
+I1 log_int: +5.0% [+2.9, +7.2], p = 2.62e-06
+I2 log_int: +4.9% [+2.7, +7.0], p = 6.11e-06
+I4 Q2 vs Q1: +10.5% [-3.0, +26.0], p = 0.133
+I4 Q3 vs Q1: +12.1% [-1.7, +27.8], p = 0.0892
+I4 Q4 longest vs Q1: +33.2% [+16.0, +53.0], p = 5.05e-05
+I3 log_int_within: +4.1% [+1.8, +6.4], p = 0.000322
+I3 log_int_between: +10.2% [+4.1, +16.7], p = 0.000813
+I3 log_prev_dur: -2.0% [-6.3, +2.5], p = 0.376
+I3 C(sunshade)[T.sun]: +12.6% [-2.0, +29.3], p = 0.0939
+I3 Temp_z: -21.1% [-33.9, -5.8], p = 0.00882
+I3 solar_z: +10.2% [-4.2, +26.8], p = 0.173
+I3 wind_z: -2.5% [-10.2, +6.0], p = 0.555
+I3 hour_z: +11.5% [-5.5, +31.5], p = 0.197
+I3 rank_z: -1.8% [-9.1, +6.1], p = 0.646
+
+Variance components (log scale):
+    observation  flower   bout  residual     n
+D1        0.621     NaN    NaN     0.659  1210
+D2        0.646     NaN    NaN     0.651  1200
+D3        0.668     NaN  0.046     0.627  1210
+I1        0.573   0.031  0.003     0.624  1200
+I2        0.526   0.032  0.023     0.614  1200
+I3        0.478   0.028  0.021     0.615  1200
+I4        0.633   0.023  0.000     0.627  1200
