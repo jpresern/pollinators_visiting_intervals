@@ -6,10 +6,7 @@ and saves results/model_diagnostics.png (histogram, normal Q-Q plot, residuals v
 
 Usage: python src/diagnostics.py [--data XLSX] [--sheet apple] [--outdir results]
 """
-import argparse
-import os
 import warnings
-from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -32,21 +29,13 @@ def describe(x, name):
           f"excess kurtosis={stats.kurtosis(x):+.2f}  Shapiro W={sw.statistic:.3f} p={sw.pvalue:.2g}")
 
 
-def main():
-    os.chdir(Path(__file__).resolve().parents[1])   # paths relative to the repository folder
-    ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    ap.add_argument("--data", type=Path, default=Path("data/apple_flower_visits.xlsx"))
-    ap.add_argument("--sheet", default="apple")
-    ap.add_argument("--outdir", type=Path, default=Path("results"))
-    a = ap.parse_args()
-    a.outdir.mkdir(parents=True, exist_ok=True)
-    df = pd.read_excel(a.data, sheet_name=a.sheet)
+if __name__ == "__main__":
+    args, df = da.parse_args(__doc__)
 
     d = ia.prepare(df, "honeybee")
-    cov = "Temp_z + solar_z + wind_z + hour_z + rank_z + C(sunshade) + log_prev_dur"
-    i3 = ia.fit(f"log_dur ~ log_int_within + log_int_between + {cov}", d)
+    i3 = ia.fit(ia.I_FORMULA["I3"], d)
     dp = da.prepare_pairs(df, "honeybee")
-    d1 = smf.mixedlm("log_dur ~ log_prev", dp, groups=dp["observation"]).fit(reml=True)
+    d1 = smf.mixedlm(da.D_FORMULA["D1"], dp, groups=dp["observation"]).fit(reml=True)
 
     print("Raw response")
     describe(d["duration"], "duration (s)")
@@ -59,24 +48,20 @@ def main():
     describe(re_obs, "observation intercepts")
     print("lowest observation intercepts:\n" + re_obs.head(3).round(2).to_string())
 
-    fig, ax = plt.subplots(1, 3, figsize=(13, 4), facecolor="#fcfcfb")
+    fig, ax = plt.subplots(1, 3, figsize=(13, 4), facecolor=da.SURF)
     for x in ax:
-        x.set_facecolor("#fcfcfb")
+        x.set_facecolor(da.SURF)
         for s in ("top", "right"):
             x.spines[s].set_visible(False)
-    ax[0].hist(d["log_dur"], bins=40, color="#2a78d6", alpha=0.8, edgecolor="#fcfcfb")
+    ax[0].hist(d["log_dur"], bins=40, color=da.BLUE, alpha=0.8, edgecolor=da.SURF)
     ax[0].set(title="log(duration), honeybee", xlabel="log(duration, s)", ylabel="records")
     stats.probplot(i3.resid, dist="norm", plot=ax[1])
-    ax[1].get_lines()[0].set(markerfacecolor="#2a78d6", markeredgecolor="none", markersize=3, alpha=0.6)
-    ax[1].get_lines()[1].set(color="#52514e")
+    ax[1].get_lines()[0].set(markerfacecolor=da.BLUE, markeredgecolor="none", markersize=3, alpha=0.6)
+    ax[1].get_lines()[1].set(color=da.MUTED)
     ax[1].set(title="Normal Q–Q, residuals of Model I3")
-    ax[2].scatter(i3.fittedvalues, i3.resid, s=6, color="#2a78d6", alpha=0.4)
-    ax[2].axhline(0, color="#52514e", lw=1, ls="--")
+    ax[2].scatter(i3.fittedvalues, i3.resid, s=6, color=da.BLUE, alpha=0.4)
+    ax[2].axhline(0, color=da.MUTED, lw=1, ls="--")
     ax[2].set(title="Residuals vs fitted, Model I3", xlabel="fitted log(duration)", ylabel="residual")
     fig.tight_layout()
-    fig.savefig(a.outdir / "model_diagnostics.png", dpi=150)
-    print(f"-> {a.outdir / 'model_diagnostics.png'}")
-
-
-if __name__ == "__main__":
-    main()
+    fig.savefig(args.outdir / "model_diagnostics.png", dpi=150)
+    print(f"-> {args.outdir / 'model_diagnostics.png'}")

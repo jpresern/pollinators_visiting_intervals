@@ -2,6 +2,14 @@
 
 All notable changes to this repository are listed here. Versions follow semantic versioning.
 
+## [1.0.1] - 2026-11-09
+
+### Changed
+- Analysis scripts simplified: shared command-line handling, plot styling and percentage
+  conversions in one place (`analysis_durations.py`); model formulas defined once under their
+  manuscript names (D1-D3, I1-I4); models returned under those names.
+- All outputs in `results/` and all printed output are byte-for-byte identical to 1.0.0.
+
 ## [1.0.0] - 2026-11-09
 
 First release, supporting the manuscript submission.
