@@ -12,6 +12,9 @@ Reads data/apple_flower_visits.xlsx (sheet "apple") and writes to results/:
 
 Usage: python src/run_all.py [--data XLSX] [--sheet apple] [--outdir results]
 """
+
+__author__ = "jpresern"
+
 import contextlib
 import sys
 import warnings

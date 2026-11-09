@@ -5,6 +5,9 @@ A "visit" in the code is a visit bout (visit_ID).
 
 Usage: python src/analysis_intervals.py [--data XLSX] [--sheet apple] [--subject honeybee]
 """
+
+__author__ = "jpresern"
+
 import warnings
 
 import numpy as np

@@ -6,6 +6,8 @@ Also holds the helpers shared by the other scripts.
 
 Usage: python src/analysis_durations.py [--data XLSX] [--sheet apple] [--subject honeybee]
 """
+__author__ = "jpresern"
+
 import argparse
 import os
 import warnings

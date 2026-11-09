@@ -6,6 +6,9 @@ and saves results/model_diagnostics.png (histogram, normal Q-Q plot, residuals v
 
 Usage: python src/diagnostics.py [--data XLSX] [--sheet apple] [--outdir results]
 """
+
+__author__ = "jpresern"
+
 import warnings
 
 import numpy as np
