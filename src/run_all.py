@@ -17,7 +17,6 @@ __author__ = "jpresern"
 
 import contextlib
 import sys
-import warnings
 
 import numpy as np
 import pandas as pd
@@ -25,9 +24,6 @@ import pandas as pd
 import analysis_durations as da
 import analysis_intervals as ia
 from analysis_durations import pct_doubling, pct_unit, variance_components
-
-warnings.simplefilter("ignore")
-
 
 def effect(m, term):
     """Coefficient, 95% Wald CI and p, also as % change in duration."""

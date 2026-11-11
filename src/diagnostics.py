@@ -22,9 +22,6 @@ import matplotlib.pyplot as plt
 import analysis_durations as da
 import analysis_intervals as ia
 
-warnings.simplefilter("ignore")
-
-
 def describe(x, name):
     x = np.asarray(x)
     sw = stats.shapiro(x)
@@ -43,12 +40,15 @@ if __name__ == "__main__":
     print("Raw response")
     describe(d["duration"], "duration (s)")
     describe(d["log_dur"], "log(duration)")
+
     print("\nResiduals")
     describe(i3.resid, "I3 residuals")
     describe(d1.resid, "D1 residuals")
+
     print("\nRandom effects (BLUPs), I3")
     re_obs = pd.Series({k: v.iloc[0] for k, v in i3.random_effects.items()}).sort_values()
     describe(re_obs, "observation intercepts")
+
     print("lowest observation intercepts:\n" + re_obs.head(3).round(2).to_string())
 
     fig, ax = plt.subplots(1, 3, figsize=(13, 4), facecolor=da.SURF)
@@ -56,15 +56,19 @@ if __name__ == "__main__":
         x.set_facecolor(da.SURF)
         for s in ("top", "right"):
             x.spines[s].set_visible(False)
+
     ax[0].hist(d["log_dur"], bins=40, color=da.BLUE, alpha=0.8, edgecolor=da.SURF)
     ax[0].set(title="log(duration), honeybee", xlabel="log(duration, s)", ylabel="records")
     stats.probplot(i3.resid, dist="norm", plot=ax[1])
+
     ax[1].get_lines()[0].set(markerfacecolor=da.BLUE, markeredgecolor="none", markersize=3, alpha=0.6)
     ax[1].get_lines()[1].set(color=da.MUTED)
     ax[1].set(title="Normal Q–Q, residuals of Model I3")
+
     ax[2].scatter(i3.fittedvalues, i3.resid, s=6, color=da.BLUE, alpha=0.4)
     ax[2].axhline(0, color=da.MUTED, lw=1, ls="--")
     ax[2].set(title="Residuals vs fitted, Model I3", xlabel="fitted log(duration)", ylabel="residual")
+
     fig.tight_layout()
     fig.savefig(args.outdir / "model_diagnostics.png", dpi=150)
     print(f"-> {args.outdir / 'model_diagnostics.png'}")

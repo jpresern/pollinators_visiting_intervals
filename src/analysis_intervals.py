@@ -8,15 +8,17 @@ Usage: python src/analysis_intervals.py [--data XLSX] [--sheet apple] [--subject
 
 __author__ = "jpresern"
 
-import warnings
-
 import numpy as np
 import pandas as pd
 import statsmodels.formula.api as smf
 from scipy import stats
+import matplotlib
+import matplotlib.pyplot as plt
 
 from analysis_durations import (MIN_PAIRS, INK, MUTED, GRID, SURF, BLUE, check_positive,
                                 format_vc, parse_args, pct_doubling, pct_unit, style)
+
+matplotlib.use("Agg")
 
 COVARS = ["Temp", "solar", "wind", "hour", "rank"]
 COV = "Temp_z + solar_z + wind_z + hour_z + rank_z + C(sunshade) + log_prev_dur"
@@ -68,7 +70,7 @@ def effect_row(m, term, label):
 
 def analyse(df, subject="honeybee", plot_path=None):
     """Prints the results; returns the data and Models I1-I4."""
-    warnings.simplefilter("ignore")
+
     d = prepare(df, subject)
     print(f"\n=== {subject}: {len(d)} records from {d['visit_ID'].nunique()} visits, "
           f"{d['observation'].nunique()} observations ===")
@@ -128,9 +130,7 @@ FIGURE_TERMS = [("log_int_within", "Previous interval ×2, within bout", True),
 
 
 def plot(d, m, subject, path):
-    import matplotlib
-    matplotlib.use("Agg")
-    import matplotlib.pyplot as plt
+
 
     fig, (a1, a2) = plt.subplots(1, 2, figsize=(12.5, 5.4), facecolor=SURF,
                                  gridspec_kw={"width_ratios": [1.1, 1]})

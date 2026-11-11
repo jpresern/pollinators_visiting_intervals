@@ -10,13 +10,17 @@ __author__ = "jpresern"
 
 import argparse
 import os
-import warnings
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
 import statsmodels.formula.api as smf
 from scipy import stats
+import matplotlib
+import matplotlib.pyplot as plt
+
+matplotlib.use("Agg")
+
 
 MIN_PAIRS = 30
 
@@ -145,7 +149,6 @@ def analyse(df, subject="honeybee", plot_path=None):
     spearman = stats.spearmanr(d["duration_n-1"], d["duration"])
     print(f"1) Spearman rho = {spearman.statistic:.3f}, p = {spearman.pvalue:.3g}  (ignores clustering)")
 
-    warnings.simplefilter("ignore")
     models = fit_d_models(d)
     labels = {"D1": "random intercept: observation", "D2": "+ Temp, solar, wind, sun/shade",
               "D3": "random intercepts: observation / visit"}
@@ -168,9 +171,6 @@ def analyse(df, subject="honeybee", plot_path=None):
 
 
 def plot(d, slope, perm_rho, null, perm_p, subject, path):
-    import matplotlib
-    matplotlib.use("Agg")
-    import matplotlib.pyplot as plt
 
     fig, (a1, a2) = plt.subplots(1, 2, figsize=(12, 5.2), facecolor=SURF,
                                  gridspec_kw={"width_ratios": [1.15, 1]})
